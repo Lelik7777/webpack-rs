@@ -2,6 +2,7 @@
 
 * npm i --save-dev webpack webpack-cli
 * create webpack.config.js and copy simple config from [https://webpack.js.org/](https://webpack.js.org/)
+
 ```
 const path = require('path');
 
@@ -13,12 +14,14 @@ filename: 'bundle.js',
 },
 }
 ```
+
 * create dir src and index.ts
-* in package.json create script: 
-"build":"webpack"
-* npm i -D typescript ts-loader   
+* in package.json create script:
+  "build":"webpack"
+* npm i -D typescript ts-loader
 
 add typescript for our project
+
 ```
 const path = require('path');
 
@@ -46,9 +49,11 @@ module.exports = {
     }
 }
 ```
+
 * tsc --init (create tsconfig.json)
 * rename file.js to file.ts and change entry:'./scr/index.ts'
 * npm i -D html-webpack-plugin
+
 ```
   const path = require('path');
   const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -86,13 +91,16 @@ extensions: ['.ts', '.js']
 ```
 
 for assets in rules add object
+
 ```
 //for assets
 { test: /\.(?:ico|gif|png|jpg|jpeg|svg)$/i,
         type: 'asset/resource',
 }
 ```
-and in output add   
+
+and in output add
+
 ```
   output: {
         path: path.resolve(__dirname, 'dist'),
@@ -101,11 +109,13 @@ and in output add
         assetModuleFilename: "assets/[hash][ext]"
     },
 ```
+
 * npm i -D copy-webpack-plugin
 
 (copy file from one dir to another)
 
 in plugins add
+
 ```
  const CopyPlugin = require('copy-webpack-plugin');
  plugins: [
@@ -127,7 +137,8 @@ in plugins add
         })
     ],
 ```
-* npm i -D clean-webpack-plugin 
+
+* npm i -D clean-webpack-plugin
 
 (clean dir dist after new build)
 
@@ -156,9 +167,11 @@ const {CleanWebpackPlugin} = require('clean-webpack-plugin');
         })
     ],
 ```
-* npm i -D css-loader sass-loader sass mini-css-extract-plugin 
+
+* npm i -D css-loader sass-loader sass mini-css-extract-plugin
 
 (for work with styles )
+
 ```
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 //чтобы подключить стили в сборке
@@ -222,7 +235,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
         })
     ],
    ```
+
 * add mode: development or production
+
 ```
 package.json
 
@@ -312,7 +327,11 @@ module.exports = ({develop}) => ({
     }
 });
 ```
+
 * add function devServer for mode development for live reload browser when have been changes in code
+
+  npm i webpack-dev-server
+
 ```
 const devServer = (isDev) => !isDev ? {} : {
     devServer: {
@@ -406,4 +425,48 @@ module.exports = ({develop}) => ({
     },
     ...devServer(develop)
 });
+```
+
+* npm i -D eslint-webpack-plugin eslint
+* npm i -D eslint-plugin-import eslint-config-airbnb-typescript typescript-parser @typescript-eslint/eslint-plugin
+
+add eslint for webpack
+
+* add file .eslintrc
+
+```
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "airbnb-typescript/base",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "no-plusplus": "off",
+    "no-console": "warn",
+    "max-len": ["warn", { "code": 120 }],
+    "indent": ["warn", 2, {
+      "SwitchCase": 1
+    }],
+    "@typescript-eslint/indent": ["warn", 2, {
+      "SwitchCase": 1
+    }],
+    "import/prefer-default-export": "off",
+    "no-param-reassign": ["error", {
+      "props": false
+    }]
+  },
+  "ignorePatterns": ["*config.js"]
+}
 ```

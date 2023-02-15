@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const devServer = (isDev) => !isDev ? {} : {
     devServer: {
@@ -13,15 +14,18 @@ const devServer = (isDev) => !isDev ? {} : {
         //open page on port 8080
         port: 8080,
         //если есть папка параллельно с srс,то ее указываем здесь
-       // contentBase: path.join(__dirname, 'public')
+        // contentBase: path.join(__dirname, 'public')
     }
 }
+//чтобы ESLint запускался только для production
+//проверять файлы с расширением ts and js
+const esLintPlugin = (isDev) => isDev ? [] : [new ESLintPlugin({extensions: ['ts', 'js']})];
 
 //develop поскольку наша ф-ция в качестве аргумента принимает env,а in package.json in script "dev":" webpack --env development" значение --env является develop
 module.exports = ({develop}) => ({
     mode: develop ? 'development' : 'production',
     //source-map также нужно включить в tsconfig.json
-    devtool: develop ? 'inline-source-map' : 'none',
+    devtool: develop ? 'inline-source-map' : false,
     entry: ['./src/index.ts', './src/style.scss'],
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -60,7 +64,8 @@ module.exports = ({develop}) => ({
             {
                 test: /\.s[ac]ss$/i,
                 use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
-            }
+            },
+
         ]
     },
     plugins: [
@@ -87,12 +92,18 @@ module.exports = ({develop}) => ({
         new MiniCssExtractPlugin({
             //так будет называться в dist bundle with styles
             filename: '[name].[contenthash].css'
-        })
-    ],
-    // это позволяет при импортах не указывать расширения данных файлов
-    //import {test} from "./test"; example this
-    resolve: {
-        extensions: ['.ts', '.js']
-    },
-    ...devServer(develop)
-});
+        }),
+        //проверять файлы с расширением ts and js
+        // new ESLintPlugin({extensions: ['ts', 'js']})
+        ...esLintPlugin(develop),
+],
+// это позволяет при импортах не указывать расширения данных файлов
+//import {test} from "./test"; example this
+resolve: {
+    extensions: ['.ts', '.js']
+}
+,
+...
+devServer(develop)
+})
+;
