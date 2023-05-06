@@ -103,7 +103,6 @@ resolve: {
     extensions: ['.ts', '.js']
 }
 ,
-...
-devServer(develop)
+//...devServer(develop)
 })
 ;
